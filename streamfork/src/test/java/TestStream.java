@@ -1,6 +1,12 @@
-import stream.StreamReader;
+import land.pod.space.client.Client;
+import land.pod.space.server.Server;
+import land.pod.space.stream.StreamBlock;
+import land.pod.space.stream.StreamReader;
 
 import java.io.*;
+import java.net.Socket;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Mehdi AKbarian-astaghi 10/6/19
@@ -8,8 +14,13 @@ import java.io.*;
 public class TestStream {
 
     public static void main(String[] args) throws IOException {
-        StreamReader streamReader = new StreamReader();
+        Server server = new Server();
+        ExecutorService executorService = Executors.newFixedThreadPool(3);
+        executorService.execute(() -> server.start(8087));
+       /* executorService.execute(() -> server.start(8088));
+        executorService.execute(() -> server.start(8089));*/
 
+        StreamReader streamReader = new StreamReader();
         File inputFile = File.createTempFile("temp", "txt");
 
         FileWriter fileWriter = new FileWriter(inputFile);
@@ -29,30 +40,28 @@ public class TestStream {
         InputStream fileStream = new FileInputStream(inputFile);
 
 
-        File[] copies = new File[]{new File("copy1.txt"),
-                new File("copy2.txt"),
-                new File("copy3.txt")};
+        Client client = new Client();
+        Socket c1  = client.start("127.0.0.1",8087);
 
-        for(File copy : copies)
-            copy.createNewFile();
+        /*Socket c2  = client.start("127.0.0.1",8088);
+        Socket c3  = client.start("127.0.0.1",8089);*/
 
-        FileOutputStream[] outputStreams = new FileOutputStream[]{new FileOutputStream(copies[0]),
-                new FileOutputStream(copies[1]),
-                new FileOutputStream(copies[2])};
-
+        Socket[] connections = new Socket[]{c1, /*c2, c3*/};
         int len;
         while ((len = fileStream.available()) > 0){
-            byte[] data = streamReader.read(fileStream, Math.min(len, 2048));
-            for (FileOutputStream fos : outputStreams){
-                fos.write(data);
-                System.out.println("write to:" + fos.hashCode());
+            byte[] data = streamReader.read(fileStream, len);
+            StreamBlock block = new StreamBlock("abcdefspace.test", data);
+            for (Socket connection : connections){
+                connection.getOutputStream().write(block.getFinalData());
             }
         }
 
-        for (FileOutputStream fos : outputStreams){
-            fos.flush();
-            fos.close();
-        }
+        /*for (Socket connection : connections){
+            connection.close();
+        }*/
+
+
+
 
     }
 }
