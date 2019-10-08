@@ -3,7 +3,6 @@ package land.pod.space.streamfork.stream;
 
 import land.pod.space.streamfork.exception.ProtocolException;
 
-import java.io.IOException;
 import java.io.InputStream;
 
 /**
