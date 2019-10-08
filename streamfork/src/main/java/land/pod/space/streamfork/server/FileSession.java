@@ -1,6 +1,8 @@
 package land.pod.space.streamfork.server;
 
 import land.pod.space.streamfork.AppSettings;
+import land.pod.space.streamfork.exception.FileSessionException;
+import land.pod.space.streamfork.exception.WriteFileException;
 import land.pod.space.streamfork.stream.StreamReader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -49,7 +51,7 @@ public class FileSession implements Runnable {
                             fos.write(bodyPart);
                             break;
                         default:
-                            throw new RuntimeException("unknown state on file session");
+                            throw FileSessionException.getInstance("unknown state on file session");
                     }
                 }
                 if (state == AppSettings.FILE_STATE_READ_BODY) {
@@ -61,7 +63,7 @@ public class FileSession implements Runnable {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("file session failed", e);
         }
 
     }
@@ -70,13 +72,13 @@ public class FileSession implements Runnable {
         logger.info("creating file:" + name);
         File parent = new File(AppSettings.FILE_BASE_DIR);
         if (!parent.exists())
-            parent.mkdirs();
-
+            if(!parent.mkdirs())
+                throw WriteFileException.getInstance("can not create parent folder on disk:"+ AppSettings.FILE_BASE_DIR);
         File receivedFile = new File(parent, name);
         if (receivedFile.exists())
             receivedFile = new File(parent, name + "-" + new Random().nextInt(1000));
         if (!receivedFile.createNewFile())
-            throw new RuntimeException("can not create file on disk");
+            throw WriteFileException.getInstance("can not create file on disk");
         return new FileOutputStream(receivedFile);
     }
 }
