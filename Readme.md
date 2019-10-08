@@ -2,6 +2,9 @@
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/5f1f8d2a036c405d8dc713bc656561cb)](https://www.codacy.com/manual/makbn/fdt_streamfork?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=makbn/fdt_streamfork&amp;utm_campaign=Badge_Grade)
 
+Streamfork make it possible to connect input streaming data to multi source output stream directly! This project is part of POD cloud storage backend for saving user files to multi file servers. 
+* Currently, the protocol that used in Streamfork is just adapted to our scenario and file nameing is fixed len (16byte).
+
 ### Server example
 
 Starting three server on `localhost` from port 8050 to 8052:
