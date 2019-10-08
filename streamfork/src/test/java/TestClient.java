@@ -48,12 +48,11 @@ public class TestClient {
         while ((len = fileStream.available()) > 0){
             data = StreamReader.read(fileStream, len);
         }
-        int counter =10;
-        while (counter-- >0) {
-            String name = UUID.randomUUID().toString().substring(0, 16);
-            StreamBlock block = new StreamBlock(name, data);
-            client.write(block);
-        }
 
+        String name = UUID.randomUUID().toString().substring(0, 16);
+        StreamBlock block = new StreamBlock(name, data);
+        client.write(block);
+
+        System.exit(0);
     }
 }
