@@ -2,6 +2,7 @@ package land.pod.space.streamfork.server;
 
 import land.pod.space.streamfork.AppSettingsUtils;
 import land.pod.space.streamfork.exception.FileSessionException;
+import land.pod.space.streamfork.exception.ProtocolException;
 import land.pod.space.streamfork.exception.WriteFileException;
 import land.pod.space.streamfork.stream.StreamReader;
 import org.apache.logging.log4j.LogManager;
@@ -23,7 +24,7 @@ public class FileSession implements Runnable {
         this.client = client;
     }
 
-    public static FileSession startNewSession(Socket client) {
+    static FileSession startNewSession(Socket client) {
         return new FileSession(client);
     }
 
@@ -38,8 +39,10 @@ public class FileSession implements Runnable {
                     switch (state) {
                         case AppSettingsUtils.FILE_STATE_READ_NAME:
                             logger.info("read file name state");
-                            byte[] nameByte = new byte[16];
-                            is.read(nameByte);
+                            byte[] nameByte = new byte[AppSettingsUtils.FILE_NAME_LEN];
+                            int len = is.read(nameByte);
+                            if(len != AppSettingsUtils.FILE_NAME_LEN)
+                                throw ProtocolException.getInstance("name len is not standard");
                             String name = new String(nameByte, StandardCharsets.UTF_8.name());
                             fos = createFile(name);
                             state = AppSettingsUtils.FILE_STATE_READ_BODY;
@@ -71,9 +74,8 @@ public class FileSession implements Runnable {
     private FileOutputStream createFile(String name) throws IOException {
         logger.info("creating file:" + name);
         File parent = new File(AppSettingsUtils.FILE_BASE_DIR);
-        if (!parent.exists())
-            if(!parent.mkdirs())
-                throw WriteFileException.getInstance("can not create parent folder on disk:"+ AppSettingsUtils.FILE_BASE_DIR);
+        if (!parent.exists() && !parent.mkdirs())
+            throw WriteFileException.getInstance("can not create parent folder on disk:"+ AppSettingsUtils.FILE_BASE_DIR);
         File receivedFile = new File(parent, name);
         if (receivedFile.exists())
             receivedFile = new File(parent, name + "-" + new Random().nextInt(1000));

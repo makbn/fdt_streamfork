@@ -1,6 +1,7 @@
 package land.pod.space.streamfork.stream;
 
 import land.pod.space.streamfork.AppSettingsUtils;
+import land.pod.space.streamfork.exception.ProtocolException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,7 +20,9 @@ public class StreamBlock {
 
     public StreamBlock(InputStream is, String name) throws IOException {
         this.data = new byte[is.available()];
-        is.read(this.data);
+        int len = is.read(this.data);
+        if(len != data.length)
+            throw ProtocolException.getInstance("data len is not equal to inputStream size");
         this.name = name;
         constructFinalData();
     }
@@ -27,7 +30,7 @@ public class StreamBlock {
     private void constructFinalData() {
         byte[] nameBytes = name.getBytes();
         if (nameBytes.length != AppSettingsUtils.FILE_NAME_LEN) {
-            throw new RuntimeException("file name len is not standard");
+            throw ProtocolException.getInstance("file name len is not standard");
         }
 
         finalData = new byte[nameBytes.length + data.length];
