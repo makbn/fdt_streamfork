@@ -1,6 +1,6 @@
-package land.pod.space.stream;
+package land.pod.space.streamfork.stream;
 
-import land.pod.space.Constant;
+import land.pod.space.streamfork.Constant;
 
 import java.io.IOException;
 import java.io.InputStream;

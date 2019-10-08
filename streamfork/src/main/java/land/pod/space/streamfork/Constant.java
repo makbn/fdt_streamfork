@@ -1,4 +1,4 @@
-package land.pod.space;
+package land.pod.space.streamfork;
 
 public class Constant {
     public final static int FILE_NAME_LEN = 16;

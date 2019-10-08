@@ -1,4 +1,4 @@
-package land.pod.space.stream;
+package land.pod.space.streamfork.stream;
 
 public enum StreamMode {
     /*send data to all servers in parallel */

@@ -1,7 +1,7 @@
-import land.pod.space.client.SFClient;
-import land.pod.space.stream.StreamBlock;
-import land.pod.space.stream.StreamMode;
-import land.pod.space.stream.StreamReader;
+import land.pod.space.streamfork.client.SFClient;
+import land.pod.space.streamfork.stream.StreamBlock;
+import land.pod.space.streamfork.stream.StreamMode;
+import land.pod.space.streamfork.stream.StreamReader;
 
 import java.io.*;
 import java.util.UUID;

@@ -1,9 +1,9 @@
-package land.pod.space.server;
+package land.pod.space.streamfork.server;
 
-import land.pod.space.Constant;
-import land.pod.space.stream.StreamReader;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import land.pod.space.streamfork.Constant;
+import land.pod.space.streamfork.stream.StreamReader;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -14,7 +14,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Random;
 
 public class FileSession implements Runnable {
-    private static Logger logger = LoggerFactory.getLogger(FileSession.class);
+    private static Logger logger = LogManager.getLogger(FileSession.class.getName());
     private Socket client;
 
     private FileSession(Socket client) {
@@ -39,7 +39,6 @@ public class FileSession implements Runnable {
                             byte[] nameByte = new byte[16];
                             is.read(nameByte);
                             String name = new String(nameByte, StandardCharsets.UTF_8.name());
-                            System.out.println(name);
                             fos = createFile(name);
                             state = Constant.FILE_STATE_READ_BODY;
                             break;

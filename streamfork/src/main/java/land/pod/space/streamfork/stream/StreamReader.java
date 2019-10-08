@@ -1,4 +1,4 @@
-package land.pod.space.stream;
+package land.pod.space.streamfork.stream;
 
 
 import java.io.IOException;
@@ -26,7 +26,7 @@ public class StreamReader {
             }
             if (lastRead <= 0) {
                 Thread.currentThread().interrupt();
-                throw new IOException("readed land.pod.space.stream size is " + lastRead);
+                throw new IOException("readed land.pod.space.streamfork.stream size is " + lastRead);
             }
             bytes = byteAppendHelper(bytes, byteBuffer, lastRead, readLength);
             readLength += lastRead;

@@ -1,8 +1,7 @@
-package land.pod.space.server;
+package land.pod.space.streamfork.server;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
@@ -12,7 +11,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class SFServer {
-    private static Logger logger = LoggerFactory.getLogger(SFServer.class);
+    private static Logger logger = LogManager.getLogger(SFServer.class.getName());
     private AtomicBoolean stop = new AtomicBoolean(false);
 
     public void start(String address, int port, int queueSize) {

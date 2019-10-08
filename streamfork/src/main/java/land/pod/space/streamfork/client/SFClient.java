@@ -1,9 +1,9 @@
-package land.pod.space.client;
+package land.pod.space.streamfork.client;
 
-import land.pod.space.stream.StreamBlock;
-import land.pod.space.stream.StreamMode;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import land.pod.space.streamfork.stream.StreamBlock;
+import land.pod.space.streamfork.stream.StreamMode;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -15,7 +15,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 public class SFClient {
-    private static Logger logger = LoggerFactory.getLogger(SFClient.class);
+    private static Logger logger = LogManager.getLogger(SFClient.class.getName());
     private ArrayList<Socket> connections;
     private StreamMode mode;
     private boolean autoClosable = true;
