@@ -15,7 +15,7 @@ for (int i=0;i<TEST_SERVER_COUNT;i++){
 
 ### client example
 
-Connecting client to the started server
+Let's create a temp file for sending to servers:
 
 ```java
 File inputFile = File.createTempFile("temp", "txt");
@@ -34,12 +34,15 @@ printWriter.print("Lorem Ipsum is simply dummy text of the printing" +
 printWriter.close();
 InputStream fileStream = new FileInputStream(inputFile);
 
+```
+Now connecting a client to the started servers:
+
+```java
 SFClient client = SFClient.get(StreamMode.Parallel)
         .addServer("127.0.0.1",8050)
         .addServer("127.0.0.1",8051)
         .addServer("127.0.0.1",8052)
         .setAutoClosable(true);
-
 
 int len;
 byte[] data = null;
@@ -51,3 +54,5 @@ String name = UUID.randomUUID().toString().substring(0, 16);
 StreamBlock block = new StreamBlock(name, data);
 client.write(block);
 ```
+
+In the provided example 3 server started and client send a file with random fixed name len (16 char) to servers and servers save file on `file` folder under the classpath directory
