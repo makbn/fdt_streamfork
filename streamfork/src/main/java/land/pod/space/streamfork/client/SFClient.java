@@ -53,7 +53,9 @@ public class SFClient {
         } else {
             parallelWrite(block);
         }
-        checkForClose();
+        if(autoClosable) {
+            checkForClose();
+        }
     }
 
     private void checkForClose() throws IOException, InterruptedException {

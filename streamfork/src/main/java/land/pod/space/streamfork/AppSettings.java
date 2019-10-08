@@ -1,6 +1,6 @@
 package land.pod.space.streamfork;
 
-public class Constant {
+public class AppSettings {
     public final static int FILE_NAME_LEN = 16;
     public final static int FILE_STATE_READ_NAME = 1;
     public final static int FILE_STATE_READ_BODY = 2;
