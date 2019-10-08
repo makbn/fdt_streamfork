@@ -1,6 +1,8 @@
 package land.pod.space.streamfork.stream;
 
 
+import land.pod.space.streamfork.exception.ProtocolException;
+
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -9,7 +11,7 @@ import java.io.InputStream;
  */
 public class StreamReader {
 
-    public static byte[] read(InputStream inputStream, int size) throws IOException {
+    public static byte[] read(InputStream inputStream, int size) {
         byte[] bytes = new byte[size];
         int readLength = 0;
         int remainingLength = size;
@@ -26,9 +28,9 @@ public class StreamReader {
             }
             if (lastRead <= 0) {
                 Thread.currentThread().interrupt();
-                throw new IOException("readed land.pod.space.streamfork.stream size is " + lastRead);
+                throw ProtocolException.getInstance("read size is " + lastRead);
             }
-            bytes = byteAppendHelper(bytes, byteBuffer, lastRead, readLength);
+            byteAppendHelper(bytes, byteBuffer, lastRead, readLength);
             readLength += lastRead;
             remainingLength -= lastRead;
         }
@@ -38,7 +40,6 @@ public class StreamReader {
 
     private static byte[] byteAppendHelper(byte[] dest, byte[] src, int lenght, int pos) {
         System.arraycopy(src, 0, dest, pos, lenght);
-
         return dest;
     }
 }
