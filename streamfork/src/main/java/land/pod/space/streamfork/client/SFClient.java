@@ -53,7 +53,7 @@ public class SFClient {
         } else {
             parallelWrite(block);
         }
-        if(autoClosable) {
+        if (autoClosable) {
             checkForClose();
         }
     }

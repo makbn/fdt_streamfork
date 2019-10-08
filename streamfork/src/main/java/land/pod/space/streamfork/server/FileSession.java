@@ -48,6 +48,8 @@ public class FileSession implements Runnable {
                                     Math.min(AppSettings.FILE_READ_BODY_BLOCK_SIZE, is.available()));
                             fos.write(bodyPart);
                             break;
+                        default:
+                            throw new RuntimeException("unknown state on file session");
                     }
                 }
                 if (state == AppSettings.FILE_STATE_READ_BODY) {

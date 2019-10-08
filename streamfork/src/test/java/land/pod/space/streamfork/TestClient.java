@@ -1,3 +1,5 @@
+package land.pod.space.streamfork;
+
 import land.pod.space.streamfork.client.SFClient;
 import land.pod.space.streamfork.stream.StreamBlock;
 import land.pod.space.streamfork.stream.StreamMode;

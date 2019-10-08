@@ -41,17 +41,4 @@ public class StreamReader {
 
         return dest;
     }
-
-    private byte[] readHelper(InputStream inputStream, int len) {
-        byte[] result = new byte[len];
-        for (int i = 0; i < len; i++) {
-            try {
-                int t = inputStream.read(result, 0, len);
-                result[i] = (byte) t;
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        return result;
-    }
 }
