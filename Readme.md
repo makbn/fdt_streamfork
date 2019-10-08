@@ -55,4 +55,4 @@ StreamBlock block = new StreamBlock(name, data);
 client.write(block);
 ```
 
-In the provided example 3 servers started and client send a file with random fixed name len (16 char) to servers and servers save file on `file` folder under the classpath directory
+In the provided example 3 servers started and a client send a file with random fixed name len (16 char) to servers and servers save file on `file` folder under the classpath directory
