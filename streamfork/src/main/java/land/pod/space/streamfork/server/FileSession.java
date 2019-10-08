@@ -1,6 +1,6 @@
 package land.pod.space.streamfork.server;
 
-import land.pod.space.streamfork.AppSettings;
+import land.pod.space.streamfork.AppSettingsUtils;
 import land.pod.space.streamfork.exception.FileSessionException;
 import land.pod.space.streamfork.exception.WriteFileException;
 import land.pod.space.streamfork.stream.StreamReader;
@@ -29,34 +29,34 @@ public class FileSession implements Runnable {
 
     @Override
     public void run() {
-        int state = AppSettings.FILE_STATE_READ_NAME;
+        int state = AppSettingsUtils.FILE_STATE_READ_NAME;
         try {
             InputStream is = client.getInputStream();
             FileOutputStream fos = null;
             while (!client.isClosed()) {
-                while (state != AppSettings.FILE_STATE_CREATED && is.available() > 0) {
+                while (state != AppSettingsUtils.FILE_STATE_CREATED && is.available() > 0) {
                     switch (state) {
-                        case AppSettings.FILE_STATE_READ_NAME:
+                        case AppSettingsUtils.FILE_STATE_READ_NAME:
                             logger.info("read file name state");
                             byte[] nameByte = new byte[16];
                             is.read(nameByte);
                             String name = new String(nameByte, StandardCharsets.UTF_8.name());
                             fos = createFile(name);
-                            state = AppSettings.FILE_STATE_READ_BODY;
+                            state = AppSettingsUtils.FILE_STATE_READ_BODY;
                             break;
-                        case AppSettings.FILE_STATE_READ_BODY:
+                        case AppSettingsUtils.FILE_STATE_READ_BODY:
                             logger.info("read body of file");
                             byte[] bodyPart = StreamReader.read(is,
-                                    Math.min(AppSettings.FILE_READ_BODY_BLOCK_SIZE, is.available()));
+                                    Math.min(AppSettingsUtils.FILE_READ_BODY_BLOCK_SIZE, is.available()));
                             fos.write(bodyPart);
                             break;
                         default:
                             throw FileSessionException.getInstance("unknown state on file session");
                     }
                 }
-                if (state == AppSettings.FILE_STATE_READ_BODY) {
+                if (state == AppSettingsUtils.FILE_STATE_READ_BODY) {
                     logger.info("file created");
-                    state = AppSettings.FILE_STATE_CREATED;
+                    state = AppSettingsUtils.FILE_STATE_CREATED;
                     fos.flush();
                     fos.close();
                     client.close();
@@ -70,10 +70,10 @@ public class FileSession implements Runnable {
 
     private FileOutputStream createFile(String name) throws IOException {
         logger.info("creating file:" + name);
-        File parent = new File(AppSettings.FILE_BASE_DIR);
+        File parent = new File(AppSettingsUtils.FILE_BASE_DIR);
         if (!parent.exists())
             if(!parent.mkdirs())
-                throw WriteFileException.getInstance("can not create parent folder on disk:"+ AppSettings.FILE_BASE_DIR);
+                throw WriteFileException.getInstance("can not create parent folder on disk:"+ AppSettingsUtils.FILE_BASE_DIR);
         File receivedFile = new File(parent, name);
         if (receivedFile.exists())
             receivedFile = new File(parent, name + "-" + new Random().nextInt(1000));

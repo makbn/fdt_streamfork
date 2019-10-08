@@ -102,7 +102,7 @@ public class SFClient {
 
     private Socket checkSocket(Socket socket) throws IOException {
         if (socket.isClosed()) {
-            socket = new Socket(socket.getInetAddress(), socket.getPort());
+            return new Socket(socket.getInetAddress(), socket.getPort());
         }
         return socket;
     }

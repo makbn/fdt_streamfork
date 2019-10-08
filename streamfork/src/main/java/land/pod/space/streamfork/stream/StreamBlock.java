@@ -1,6 +1,6 @@
 package land.pod.space.streamfork.stream;
 
-import land.pod.space.streamfork.AppSettings;
+import land.pod.space.streamfork.AppSettingsUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,7 +26,7 @@ public class StreamBlock {
 
     private void constructFinalData() {
         byte[] nameBytes = name.getBytes();
-        if (nameBytes.length != AppSettings.FILE_NAME_LEN) {
+        if (nameBytes.length != AppSettingsUtils.FILE_NAME_LEN) {
             throw new RuntimeException("file name len is not standard");
         }
 
