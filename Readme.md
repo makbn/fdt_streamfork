@@ -2,7 +2,7 @@
 
 ### Server example
 
-Starting three server on `localhost` from `tcp` port 8050 to 8052
+Starting three server on `localhost` from port 8050 to 8052
 ```java
 int TEST_SERVER_COUNT  = 3;
 int PORT_RANGE=8050;
