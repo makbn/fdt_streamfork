@@ -2,7 +2,7 @@
 
 ### Server example
 
-Starting three server on `localhost` from port 8050 to 8052
+Starting three server on `localhost` from port 8050 to 8052:
 ```java
 int TEST_SERVER_COUNT  = 3;
 int PORT_RANGE=8050;
@@ -13,9 +13,9 @@ for (int i=0;i<TEST_SERVER_COUNT;i++){
 }
 ```
 
-### client example
+### Client example
 
-Let's create a temp file for sending to servers:
+Let's create a temp file for sending to the servers:
 
 ```java
 File inputFile = File.createTempFile("temp", "txt");
@@ -55,4 +55,4 @@ StreamBlock block = new StreamBlock(name, data);
 client.write(block);
 ```
 
-In the provided example 3 server started and client send a file with random fixed name len (16 char) to servers and servers save file on `file` folder under the classpath directory
+In the provided example 3 servers started and client send a file with random fixed name len (16 char) to servers and servers save file on `file` folder under the classpath directory
