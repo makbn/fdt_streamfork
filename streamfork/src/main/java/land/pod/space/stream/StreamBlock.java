@@ -26,7 +26,7 @@ public class StreamBlock {
 
     private void constructFinalData() {
         byte[] nameBytes = name.getBytes();
-        if(nameBytes.length != Constant.FILE_NAME_LEN){
+        if (nameBytes.length != Constant.FILE_NAME_LEN) {
             throw new RuntimeException("file name len is not standard");
         }
 

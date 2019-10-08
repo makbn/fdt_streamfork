@@ -1,47 +1,39 @@
 package land.pod.space.server;
 
-import land.pod.space.Constant;
-import land.pod.space.stream.StreamReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.nio.charset.StandardCharsets;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class SFServer {
+    private static Logger logger = LoggerFactory.getLogger(SFServer.class);
+    private AtomicBoolean stop = new AtomicBoolean(false);
 
-    public void start(String address, int port, int queueSize){
+    public void start(String address, int port, int queueSize) {
         Executor exe = Executors.newCachedThreadPool();
-        try (ServerSocket listener = new ServerSocket(port,queueSize, InetAddress.getByName(address))) {
-            System.out.println("server is running at port:"+port);
-            while (true) {
+        try (ServerSocket listener = new ServerSocket(port, queueSize, InetAddress.getByName(address))) {
+            logger.info("server is running at port:" + port);
+            while (!stop.get()) {
                 Socket socket = listener.accept();
                 print(socket);
                 exe.execute(FileSession.startNewSession(socket));
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("SFServer stopped", e);
         }
     }
 
     private void print(Socket socket) {
-        System.out.println("new clinet accepted:"+socket.getPort());
+        logger.info("new client accepted:" + socket.getPort());
     }
 
-
-    private static String convertInputStreamToString(InputStream inputStream) throws IOException {
-
-        ByteArrayOutputStream result = new ByteArrayOutputStream();
-        byte[] buffer = new byte[1024];
-        int length;
-        while ((length = inputStream.read(buffer)) != -1) {
-            result.write(buffer, 0, length);
-        }
-
-        return result.toString(StandardCharsets.UTF_8.name());
-
+    public void stop() {
+        this.stop.set(true);
     }
 }

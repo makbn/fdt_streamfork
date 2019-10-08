@@ -2,6 +2,8 @@ package land.pod.space.client;
 
 import land.pod.space.stream.StreamBlock;
 import land.pod.space.stream.StreamMode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -13,20 +15,20 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 public class SFClient {
-
+    private static Logger logger = LoggerFactory.getLogger(SFClient.class);
     private ArrayList<Socket> connections;
     private StreamMode mode;
     private boolean autoClosable = true;
     private CountDownLatch parallelLatch;
     private int maxParallelTimeout = -1;
 
-    public static SFClient get(StreamMode mode){
-        return new SFClient(mode);
-    }
-
     private SFClient(StreamMode mode) {
         this.connections = new ArrayList<>();
         this.mode = mode;
+    }
+
+    public static SFClient get(StreamMode mode) {
+        return new SFClient(mode);
     }
 
     public SFClient setMaxParallelTimeout(int maxParallelTimeout) {
@@ -35,7 +37,7 @@ public class SFClient {
     }
 
     public SFClient addServer(String host, int port) throws IOException {
-        Socket socket = new Socket( host, port);
+        Socket socket = new Socket(host, port);
         connections.add(socket);
         return this;
     }
@@ -46,35 +48,35 @@ public class SFClient {
     }
 
     public void write(StreamBlock block) throws IOException, InterruptedException {
-        if (mode == StreamMode.Serial){
+        if (mode == StreamMode.Serial) {
             serialWrite(block);
-        }else {
+        } else {
             parallelWrite(block);
         }
         checkForClose();
     }
 
     private void checkForClose() throws IOException, InterruptedException {
-        System.out.print("closing client");
-        if (mode == StreamMode.Serial){
-            System.out.println(" in serial mode");
-            for (Socket s : connections){
+        logger.info("closing client:");
+        if (mode == StreamMode.Serial) {
+            logger.info("closing in serial mode");
+            for (Socket s : connections) {
                 s.close();
             }
-        }else {
-            System.out.println(" in parallel mode! waiting for latch");
-            if(maxParallelTimeout == -1)
+        } else {
+            logger.info("closing in parallel mode! waiting for latch");
+            if (maxParallelTimeout == -1)
                 parallelLatch.await();
             else
                 parallelLatch.await(maxParallelTimeout, TimeUnit.MILLISECONDS);
 
-            System.out.println("latch triggered");
-            for (Socket s : connections){
+            logger.info("latch triggered");
+            for (Socket s : connections) {
                 s.close();
             }
         }
 
-        System.out.println("connections closed!");
+        logger.info("connections closed!");
     }
 
 
@@ -82,12 +84,12 @@ public class SFClient {
         try {
             checkForClose();
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            logger.error("exception on closing SFClient", e);
         }
     }
 
     private void serialWrite(StreamBlock block) throws IOException {
-        for (Socket socket: connections){
+        for (Socket socket : connections) {
             socket = checkSocket(socket);
             OutputStream os = socket.getOutputStream();
             os.write(block.getFinalData());
@@ -97,21 +99,21 @@ public class SFClient {
     }
 
     private Socket checkSocket(Socket socket) throws IOException {
-        if(socket.isClosed()){
+        if (socket.isClosed()) {
             socket = new Socket(socket.getInetAddress(), socket.getPort());
         }
         return socket;
     }
 
-    private void parallelWrite(StreamBlock block){
+    private void parallelWrite(StreamBlock block) {
         ExecutorService executorService = Executors.newFixedThreadPool(connections.size());
         ParallelExceptionCallback callback = e -> {
             Thread t = Thread.currentThread();
             t.getUncaughtExceptionHandler().uncaughtException(t, e);
         };
         parallelLatch = new CountDownLatch(connections.size());
-        for (Socket socket: connections){
-            executorService.execute(()->{
+        for (Socket socket : connections) {
+            executorService.execute(() -> {
                 try {
                     final Socket fSocket = checkSocket(socket);
                     OutputStream os = fSocket.getOutputStream();

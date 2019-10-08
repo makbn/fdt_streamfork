@@ -4,7 +4,6 @@ import land.pod.space.stream.StreamMode;
 import land.pod.space.stream.StreamReader;
 
 import java.io.*;
-import java.net.Socket;
 import java.util.UUID;
 
 /**
@@ -14,6 +13,7 @@ public class TestClient {
 
     /**
      * {{@link TestServer}} should be started!
+     *
      * @param args
      * @throws IOException
      * @throws InterruptedException
@@ -37,15 +37,15 @@ public class TestClient {
         InputStream fileStream = new FileInputStream(inputFile);
 
         SFClient client = SFClient.get(StreamMode.Parallel)
-                .addServer("127.0.0.1",8050)
-                .addServer("127.0.0.1",8051)
-                .addServer("127.0.0.1",8052)
+                .addServer("127.0.0.1", 8050)
+                .addServer("127.0.0.1", 8051)
+                .addServer("127.0.0.1", 8052)
                 .setAutoClosable(true);
 
 
         int len;
         byte[] data = null;
-        while ((len = fileStream.available()) > 0){
+        while ((len = fileStream.available()) > 0) {
             data = StreamReader.read(fileStream, len);
         }
 

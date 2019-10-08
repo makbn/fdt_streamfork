@@ -1,7 +1,5 @@
 package land.pod.space;
 
-import land.pod.space.stream.StreamReader;
-
 public class Constant {
     public final static int FILE_NAME_LEN = 16;
     public final static int FILE_STATE_READ_NAME = 1;

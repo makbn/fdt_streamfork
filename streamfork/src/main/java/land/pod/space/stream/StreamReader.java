@@ -9,18 +9,18 @@ import java.io.InputStream;
  */
 public class StreamReader {
 
-    public static byte[] read(InputStream inputStream, int size) throws IOException{
-        byte[] bytes=new byte[size];
-        int readLength =0;
-        int remainingLength=size;
-        int lastRead=0;
-        
-        while (readLength <size) {
+    public static byte[] read(InputStream inputStream, int size) throws IOException {
+        byte[] bytes = new byte[size];
+        int readLength = 0;
+        int remainingLength = size;
+        int lastRead = 0;
+
+        while (readLength < size) {
             int countToRead = Math.min(remainingLength, 2048);
-            byte[] byteBuffer=new byte[countToRead];
-            try{
-            lastRead = inputStream.read(byteBuffer,0,countToRead);
-            }catch(Exception e){
+            byte[] byteBuffer = new byte[countToRead];
+            try {
+                lastRead = inputStream.read(byteBuffer, 0, countToRead);
+            } catch (Exception e) {
                 e.printStackTrace();
                 Thread.currentThread().interrupt();
             }
@@ -29,25 +29,25 @@ public class StreamReader {
                 throw new IOException("readed land.pod.space.stream size is " + lastRead);
             }
             bytes = byteAppendHelper(bytes, byteBuffer, lastRead, readLength);
-            readLength +=lastRead;
+            readLength += lastRead;
             remainingLength -= lastRead;
         }
         return bytes;
     }
 
 
-    private static byte[] byteAppendHelper(byte[] dest,byte[] src,int lenght,int pos){
-        System.arraycopy(src,0,dest,pos,lenght);
+    private static byte[] byteAppendHelper(byte[] dest, byte[] src, int lenght, int pos) {
+        System.arraycopy(src, 0, dest, pos, lenght);
 
         return dest;
     }
 
-    private byte[] readHelper(InputStream inputStream,int len){
-        byte[] result=new  byte[len];
-        for (int i=0;i<len;i++){
+    private byte[] readHelper(InputStream inputStream, int len) {
+        byte[] result = new byte[len];
+        for (int i = 0; i < len; i++) {
             try {
-                int t=inputStream.read(result,0,len);
-                result[i]= (byte) t;
+                int t = inputStream.read(result, 0, len);
+                result[i] = (byte) t;
             } catch (IOException e) {
                 e.printStackTrace();
             }
