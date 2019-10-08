@@ -1,26 +1,24 @@
-import land.pod.space.client.Client;
-import land.pod.space.server.Server;
+import land.pod.space.client.SFClient;
 import land.pod.space.stream.StreamBlock;
+import land.pod.space.stream.StreamMode;
 import land.pod.space.stream.StreamReader;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.UUID;
 
 /**
  * Mehdi AKbarian-astaghi 10/6/19
  */
-public class TestStream {
+public class TestClient {
 
-    public static void main(String[] args) throws IOException {
-        Server server = new Server();
-        ExecutorService executorService = Executors.newFixedThreadPool(3);
-        executorService.execute(() -> server.start(8087));
-       /* executorService.execute(() -> server.start(8088));
-        executorService.execute(() -> server.start(8089));*/
-
-        StreamReader streamReader = new StreamReader();
+    /**
+     * {{@link TestServer}} should be started!
+     * @param args
+     * @throws IOException
+     * @throws InterruptedException
+     */
+    public static void main(String[] args) throws IOException, InterruptedException {
         File inputFile = File.createTempFile("temp", "txt");
 
         FileWriter fileWriter = new FileWriter(inputFile);
@@ -36,32 +34,26 @@ public class TestStream {
                 "sum passages, and more recently with desktop publishing so" +
                 "ftware like Aldus PageMaker including versions of Lorem Ipsum.");
         printWriter.close();
-
         InputStream fileStream = new FileInputStream(inputFile);
 
+        SFClient client = SFClient.get(StreamMode.Parallel)
+                .addServer("127.0.0.1",8050)
+                .addServer("127.0.0.1",8051)
+                .addServer("127.0.0.1",8052)
+                .setAutoClosable(true);
 
-        Client client = new Client();
-        Socket c1  = client.start("127.0.0.1",8087);
 
-        /*Socket c2  = client.start("127.0.0.1",8088);
-        Socket c3  = client.start("127.0.0.1",8089);*/
-
-        Socket[] connections = new Socket[]{c1, /*c2, c3*/};
         int len;
+        byte[] data = null;
         while ((len = fileStream.available()) > 0){
-            byte[] data = streamReader.read(fileStream, len);
-            StreamBlock block = new StreamBlock("abcdefspace.test", data);
-            for (Socket connection : connections){
-                connection.getOutputStream().write(block.getFinalData());
-            }
+            data = StreamReader.read(fileStream, len);
         }
-
-        /*for (Socket connection : connections){
-            connection.close();
-        }*/
-
-
-
+        int counter =10;
+        while (counter-- >0) {
+            String name = UUID.randomUUID().toString().substring(0, 16);
+            StreamBlock block = new StreamBlock(name, data);
+            client.write(block);
+        }
 
     }
 }

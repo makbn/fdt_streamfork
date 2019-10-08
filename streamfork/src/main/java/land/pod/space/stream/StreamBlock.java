@@ -31,6 +31,8 @@ public class StreamBlock {
         }
 
         finalData = new byte[nameBytes.length + data.length];
+        System.arraycopy(nameBytes, 0, finalData, 0, nameBytes.length);
+        System.arraycopy(data, 0, finalData, nameBytes.length, data.length);
     }
 
 
