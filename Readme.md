@@ -59,6 +59,13 @@ while ((len = fileStream.available()) > 0){
 String name = UUID.randomUUID().toString().substring(0, 16);
 StreamBlock block = new StreamBlock(name, data);
 client.write(block);
+
+# or read from InputStream
+
+fileStream2 = new FileInputStream(inputFile);
+String name2 = UUID.randomUUID().toString().substring(0, 16);
+StreamBlock block2 = new StreamBlock(name2, fileStream2);
+client.write(block2);
 ```
 
 In the provided example 3 servers started and a client send a file with random fixed name len (16 char) to servers and servers save file on `files` folder under the classpath directory
