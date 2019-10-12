@@ -51,12 +51,12 @@ SFClient client = SFClient.get(StreamMode.Parallel)
         .addServer("127.0.0.1", 8052)
         .setAutoClosable(true);
         
-# read file content from byte array
+//read file content from byte array
 String name = UUID.randomUUID().toString().substring(0, 16);
 StreamBlock block = new StreamBlock(name, data);
 client.write(block);
 
-# or read from InputStream
+//or read from InputStream
 String name2 = UUID.randomUUID().toString().substring(0, 16);
 StreamBlock block2 = new StreamBlock(name2, fileStream2);
 client.write(block2);
