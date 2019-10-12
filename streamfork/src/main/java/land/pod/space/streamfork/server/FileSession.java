@@ -30,27 +30,50 @@ public class FileSession implements Runnable {
 
     @Override
     public void run() {
-        int state = AppSettingsUtils.FILE_STATE_READ_NAME;
+        int state = AppSettingsUtils.FILE_STATE_READ_NAME_LEN;
         try {
             InputStream is = client.getInputStream();
             FileOutputStream fos = null;
+            int nameLen = -1;
+            int dataLen = -1;
+            int readLen = 0;
             while (!client.isClosed()) {
-                while (state != AppSettingsUtils.FILE_STATE_CREATED && is.available() > 0) {
+                while ((state < AppSettingsUtils.FILE_STATE_READ_BODY)
+                        || (readLen <= dataLen)) {
                     switch (state) {
+                        case AppSettingsUtils.FILE_STATE_READ_NAME_LEN:
+                            byte[] nameLenByte = new byte[AppSettingsUtils.FILE_NAME_LEN];
+                            int len = is.read(nameLenByte);
+                            if (len != AppSettingsUtils.FILE_NAME_LEN)
+                                throw ProtocolException.getInstance("name len is not standard");
+                            String nameLenStr = new String(nameLenByte, StandardCharsets.UTF_8.name());
+                            nameLen = Integer.valueOf(nameLenStr);
+                            state = AppSettingsUtils.FILE_STATE_READ_NAME;
+                            break;
                         case AppSettingsUtils.FILE_STATE_READ_NAME:
                             logger.info("read file name state");
-                            byte[] nameByte = new byte[AppSettingsUtils.FILE_NAME_LEN];
-                            int len = is.read(nameByte);
-                            if(len != AppSettingsUtils.FILE_NAME_LEN)
+                            byte[] nameByte = new byte[nameLen];
+                            len = is.read(nameByte);
+                            if (len != nameLen)
                                 throw ProtocolException.getInstance("name len is not standard");
                             String name = new String(nameByte, StandardCharsets.UTF_8.name());
                             fos = createFile(name);
+                            state = AppSettingsUtils.FILE_STATE_READ_DATA_LEN;
+                            break;
+                        case AppSettingsUtils.FILE_STATE_READ_DATA_LEN:
+                            byte[] dataLenByte = new byte[AppSettingsUtils.FILE_DATA_LEN];
+                            len = is.read(dataLenByte);
+                            if (len != AppSettingsUtils.FILE_DATA_LEN)
+                                throw ProtocolException.getInstance("data len is not standard");
+                            String dataLenStr = new String(dataLenByte, StandardCharsets.UTF_8.name());
+                            dataLen = Integer.valueOf(dataLenStr);
                             state = AppSettingsUtils.FILE_STATE_READ_BODY;
                             break;
                         case AppSettingsUtils.FILE_STATE_READ_BODY:
                             logger.info("read body of file");
-                            byte[] bodyPart = StreamReader.read(is,
-                                    Math.min(AppSettingsUtils.FILE_READ_BODY_BLOCK_SIZE, is.available()));
+                            int partSize = Math.min(AppSettingsUtils.FILE_READ_BODY_BLOCK_SIZE, is.available());
+                            byte[] bodyPart = StreamReader.read(is, partSize);
+                            readLen += partSize;
                             fos.write(bodyPart);
                             break;
                         default:
@@ -76,7 +99,7 @@ public class FileSession implements Runnable {
         File parent = new File(AppSettingsUtils.FILE_BASE_DIR);
         if (!parent.exists() && !parent.mkdirs())
             throw WriteFileException.getInstance("can not create parent folder on disk:"+ AppSettingsUtils.FILE_BASE_DIR);
-        File receivedFile = new File(parent, name);
+        File receivedFile = new File(parent, name + "-" + new Random().nextInt(1000));
         if (receivedFile.exists())
             receivedFile = new File(parent, name + "-" + new Random().nextInt(1000));
         if (!receivedFile.createNewFile())

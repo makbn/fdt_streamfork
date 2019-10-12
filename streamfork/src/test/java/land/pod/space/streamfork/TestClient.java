@@ -3,10 +3,8 @@ package land.pod.space.streamfork;
 import land.pod.space.streamfork.client.SFClient;
 import land.pod.space.streamfork.stream.StreamBlock;
 import land.pod.space.streamfork.stream.StreamMode;
-import land.pod.space.streamfork.stream.StreamReader;
 
 import java.io.*;
-import java.util.UUID;
 
 /**
  * Mehdi AKbarian-astaghi 10/6/19
@@ -45,16 +43,19 @@ public class TestClient {
                 .setAutoClosable(true);
 
 
-        int len;
+     /*   int len;
         byte[] data = null;
         while ((len = fileStream.available()) > 0) {
             data = StreamReader.read(fileStream, len);
         }
 
-        String name = UUID.randomUUID().toString().substring(0, 16);
+        String name = "mynameisarvinrokni";
         StreamBlock block = new StreamBlock(name, data);
-        client.write(block);
+        client.write(block);*/
 
+        fileStream = new FileInputStream(inputFile);
+        StreamBlock block1 = new StreamBlock("xxx.txt", fileStream);
+        client.write(block1);
         System.exit(0);
     }
 }

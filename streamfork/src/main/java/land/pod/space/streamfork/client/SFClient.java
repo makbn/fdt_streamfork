@@ -1,11 +1,15 @@
 package land.pod.space.streamfork.client;
 
+import land.pod.space.streamfork.AppSettingsUtils;
+import land.pod.space.streamfork.exception.ProtocolException;
 import land.pod.space.streamfork.stream.StreamBlock;
 import land.pod.space.streamfork.stream.StreamMode;
+import land.pod.space.streamfork.stream.StreamReader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -91,6 +95,8 @@ public class SFClient {
     }
 
     private void serialWrite(StreamBlock block) throws IOException {
+        if (block.getType() == AppSettingsUtils.TYPE_STREAM)
+            throw ProtocolException.getInstance("stream and serial are not compatible");
         for (Socket socket : connections) {
             socket = checkSocket(socket);
             OutputStream os = socket.getOutputStream();
@@ -107,13 +113,58 @@ public class SFClient {
         return socket;
     }
 
-    private void parallelWrite(StreamBlock block) {
+    private void parallelWrite(StreamBlock block) throws IOException, InterruptedException {
+        if (block.getType() == AppSettingsUtils.TYPE_CONTENT) {
+            handleCWP(block);
+        } else {
+            handleSWP(block);
+        }
+    }
+
+    private void handleSWP(StreamBlock block) throws IOException, InterruptedException {
         ExecutorService executorService = Executors.newFixedThreadPool(connections.size());
-        ParallelExceptionCallback callback = e -> {
-            Thread t = Thread.currentThread();
-            t.getUncaughtExceptionHandler().uncaughtException(t, e);
-        };
         parallelLatch = new CountDownLatch(connections.size());
+        ArrayList<OutputStream> oss = new ArrayList<>();
+        ArrayList<Socket> stableSockets = new ArrayList<>();
+        for (Socket socket : connections) {
+            stableSockets.add(checkSocket(socket));
+        }
+        for (Socket socket : stableSockets) {
+            OutputStream os = socket.getOutputStream();
+            os.write(block.getHeaderData());
+            oss.add(os);
+        }
+
+        InputStream is = block.getInputStream();
+        int len;
+        while ((len = is.available()) > 0) {
+            byte[] part = StreamReader.read(is,
+                    Math.min(len, AppSettingsUtils.FILE_READ_BODY_BLOCK_SIZE));
+            parallelLatch = new CountDownLatch(connections.size());
+            for (OutputStream os : oss) {
+                executorService.execute(() -> {
+                    try {
+                        os.write(part);
+                        parallelLatch.countDown();
+                    } catch (IOException e) {
+                        logger.error("error on write", e);
+                    }
+                });
+            }
+            parallelLatch.await();
+        }
+
+        for (OutputStream os : oss) {
+            os.flush();
+            os.close();
+        }
+
+        for (Socket ss : stableSockets)
+            ss.close();
+    }
+
+    private void handleCWP(StreamBlock block) {
+        ExecutorService executorService = Executors.newFixedThreadPool(connections.size());
         for (Socket socket : connections) {
             executorService.execute(() -> {
                 try {
@@ -124,7 +175,7 @@ public class SFClient {
                     os.close();
                     parallelLatch.countDown();
                 } catch (IOException e) {
-                    callback.catchException(e);
+                    logger.error("error on write", e);
                 }
             });
         }
