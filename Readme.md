@@ -4,7 +4,7 @@
 [![Known Vulnerabilities](https://snyk.io//test/github/makbn/fdt_streamfork/badge.svg?targetFile=streamfork/pom.xml)](https://snyk.io//test/github/makbn/fdt_streamfork?targetFile=streamfork/pom.xml)
 [![Maintainability](https://api.codeclimate.com/v1/badges/8e059fd3fc3c2d3fb963/maintainability)](https://codeclimate.com/github/makbn/fdt_streamfork/maintainability)
 
-Streamfork make it possible to connect input streaming data to multi source output stream directly! This project is part of POD cloud storage backup method for saving user files to multi file servers.
+Streamfork makes it possible to connect input streaming data to multi-source Outputstream directly! This project is a part of POD cloud storage's backup method for saving users' files to multi file-servers.
 
 ### Server example
 
@@ -42,7 +42,7 @@ while ((len = fileStream.available()) > 0){
 }
 
 ```
-Now connecting a client to the started servers:
+Let's connecting a client to the started servers:
 
 ```java
 SFClient client = SFClient.get(StreamMode.Parallel)
@@ -62,4 +62,4 @@ StreamBlock block2 = new StreamBlock(name2, fileStream2);
 client.write(block2);
 ```
 
-In the provided example 3 servers started and a client send a file with random fixed name len (16 char) to servers and servers save file on `files` folder under the classpath directory
+In the provided example, 3 servers started and a client sends a file with random fixed name length (16 char) to servers and each server saves file on `files` folder under the classpath directory.
