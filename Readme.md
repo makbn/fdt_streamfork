@@ -32,7 +32,7 @@ printWriter.print("Lorem Ipsum is simply dummy text of the printing" +
 printWriter.close();
 InputStream fileStream = new FileInputStream(inputFile);
 
-#for read directly from stream
+//for read directly from stream
 InputStream fileStream2 = new FileInputStream(inputFile);
 
 int len;
