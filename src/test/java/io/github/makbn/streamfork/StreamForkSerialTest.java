@@ -32,11 +32,13 @@ class StreamForkSerialTest {
     final List<SFServer> servers = new ArrayList<>();
     final CountDownLatch startCountDownLatch = new CountDownLatch(TEST_SERVER_COUNT);
     final CountDownLatch stopCountDownLatch = new CountDownLatch(TEST_SERVER_COUNT);
+
     SFClient client;
     ExecutorService executorService;
     File dummyFile;
     String baseDir;
     int basePort = 49152;
+
     @BeforeEach
     public void setup() throws IOException, URISyntaxException, InterruptedException {
         baseDir = TestHelper.PARENT_PREFIX + UUID.randomUUID();
@@ -56,7 +58,6 @@ class StreamForkSerialTest {
             servers.add(server);
         }
         // wait for executors to start servers
-
         boolean reached = startCountDownLatch.await(5, TimeUnit.SECONDS);
 
         if (!reached) {
