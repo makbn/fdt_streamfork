@@ -39,8 +39,7 @@ class StreamForkParallelTest {
     int basePort = 49152;
     @BeforeEach
     public void setup() throws IOException, URISyntaxException, InterruptedException {
-        System.out.println("SETUP");
-        baseDir = "files-" + UUID.randomUUID();
+        baseDir = TestHelper.PARENT_PREFIX + UUID.randomUUID();
         basePort += new Random().nextInt(1000 - TEST_SERVER_COUNT);
         dummyFile = TestHelper.createTempDummyFile();
         executorService = Executors.newFixedThreadPool(TEST_SERVER_COUNT);
@@ -108,6 +107,8 @@ class StreamForkParallelTest {
         // Act
         client.write(block);
         boolean reached = latch.await(1, TimeUnit.SECONDS);
+        // we don't have ack step in the flow so when we close the client connection, it doesn't necessary meaning that
+        // we created the file on the server side! for now let's wait for 10mill before checking the files
         Thread.sleep(10);
         if (!reached) {
             Assertions.fail("writing did not finish in the expected amount of time");
